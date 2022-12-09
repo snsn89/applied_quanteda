@@ -1,0 +1,113 @@
+# Load all required packages
+#install.packages("tidyverse")
+#install.packages('R6')
+#install.packages("tidyverse")
+library(tidyverse)
+library(quanteda)         
+library(readtext)        
+library(stm)              
+library(stminsights)      
+library(wordcloud)        
+library(gsl)             
+library(topicmodels)      
+library(caret)
+library(igraph)
+#install.packages("quanteda.textplots")
+library(quanteda.textplots)
+#install.packages("quanteda.corpora")
+
+municipal=readtext('Municipalités.txt')
+mycorpus <- corpus(municipal)
+mycorpus
+#mycorpus.stats <- summary(mycorpus)
+#head(mycorpus.stats, n = 10)
+
+# Preprocess the text
+# Create tokens
+autresMots=c("d'une","ça","parce","enfin","bec","pr","re","r","comme","bien",
+             "enfin","plus", "où", "celui", "a", "n'a", "si",
+             "c'est", "pour", "donc", "ainsi", "deux","tout",
+             "alors","qu'on", "autres","tre", "b", "e", "curit", 
+             "v", "h",  "afin", "al", "alit", "lors", "entre", "aussi", 
+             "ts", "merci", "g", "va", "lev", "cr","j’ai","res",
+             "p","co","ret","sp","o","plusieurs","int","ration","dont",
+             "ya","non","tous","nombre","repr","cialis","peu", "selon",
+             "puis","peu","quand","depuis","fa","notamment","encore","tait",
+             "tant","ans","tr","monsieur","exemple","ve","mati","oui",
+             "mod","aie","gie","fois","moins","am","autre","dire","toutes",
+             "vention","souvent","dit","j'ai","sq","rement","vraiment",
+             "derni","aupr","d'un","spal","sence", 
+             "poli*","comiss*", "québec","ville", "corps", "être", "fait","à")
+token <-
+  tokens(
+    mycorpus,
+    remove_numbers = TRUE,
+    remove_punct = TRUE,
+    remove_symbols = TRUE,
+    remove_url = TRUE
+   )
+token_2 <- tokens_select(token, pattern = stopwords("French"), selection = "remove")
+token_3 <-tokens_remove(token_2, autresMots, padding = FALSE)
+
+mydfm <- dfm(token_3)
+
+head(dfm_sort(mydfm, decreasing = TRUE, margin = "both"),
+     n = 10, nf = 10)
+  
+textplot_wordcloud(mydfm, 
+                   color = rev(RColorBrewer::brewer.pal(10, "RdBu")), 
+                   rotation=0.25, 
+                   min_size = 0.5)
+#2.Analyse de frequence simple
+
+require(quanteda)
+require(quanteda.textstats)
+require(quanteda.textplots)
+require(quanteda.corpora)
+require(ggplot2)
+
+freq_simple <- textstat_frequency(mydfm, n = 100)
+head(freq_simple, 100)
+
+textstat_frequency(mydfm, n = 10) %>% 
+  ggplot(aes(x = reorder(feature, -rank), y = frequency)) +
+  geom_bar(stat = "identity") + coord_flip() + 
+  labs(x = "", y = "Analyse de fréquence, n=10 (Municipalités & Villes du QC)")
+
+mydfm %>% 
+  textstat_frequency(n = 15) %>% 
+  ggplot(aes(x = reorder(feature, frequency), y = frequency)) +
+  geom_point() +
+  coord_flip() +
+  labs(x = NULL, y = "Analyse de fréquence, n=15 (Municipalités & Villes du QC)") +
+  theme_minimal()
+
+# Création du dictionnaire avec les équivalents.
+MonDictionnaire <- dictionary(list(algorithme= c("algorithme","arbre de décision", "algorithmes de classification", "algorithmes de régression", 
+                                                 "decision tree", "clustering algorithm", "décision automatique", 
+                                                 "automated decion","algorithmiques","algorithmiques","Algorithmic","algorithmic","raisonnement analogique", "analogical reasonning", 
+                                                 "prédiction","Bayes", "classification bayésienne", "maximum likelihood", 
+                                                 "maximum de vraisemblance"),
+                                   apprentissage_automatique= c("apprentissage automatique", "apprentissage non supervisé", 
+                                                                "apprentissage supervisé", "machine learning", "deep learning", 
+                                                                "apprentissage profond", "deep belief network"),
+                                   données= c("données","Données","mégadonnées", "métadonnée", "data", "big data", "data mining", 
+                                              "fouille de données", "données personnelles", "personal data", 
+                                              "open data", "open source", "données ouvertes", "data science", 
+                                              "sciences des données"),
+                                   surveillance= c("surveillance", "detection automatique", "reconnaissance automatique", 
+                                                   "reconnaissance faciale", "police prédictive", "profiling", 
+                                                   "profilage", "reconnaissance d’image", "computer vision", 
+                                                   "traitement du langage naturel", "natural language processing", 
+                                                   "cluster", "vision automatique", "machine vision", "speech recognition", 
+                                                   "reconnaissance vocale"),
+                                   intelligence_artificielle= c("intelligence artificielle","artificielle","Intelligence artificielle","IA", "AI", "internet of things", 
+                                                                "internet des objets", "réseaux de neurones artificiels", 
+                                                                "superintelligence arificielle","l'intelligence artificielle","d'intelligence artificielle","'intelligence artificielle","artificial neuron", 
+                                                                "neurones artificielles", "bots", "chatbots")))
+#MonDictionnaire
+# Création du deuxième data.frame dans lequel on obtient le nombre d'occurences des mots du dictionnaire.
+mondfm_dictionnaire=convert(dfm(mydfm, dictionary = MonDictionnaire), "matrix")
+summary (mondfm_dictionnaire)
+
+
