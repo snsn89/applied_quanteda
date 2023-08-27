@@ -1,7 +1,7 @@
 # Load all required packages
-#install.packages("tidyverse")
-#install.packages('R6')
-#install.packages("tidyverse")
+install.packages("tidyverse")
+install.packages('R6')
+install.packages("tidyverse")
 library(tidyverse)
 library(quanteda)         
 library(readtext)        
@@ -24,7 +24,7 @@ mycorpus
 
 # Preprocess the text
 # Create tokens
-autresMots=c("d'une","ça","parce","enfin","bec","pr","re","r","comme","bien",
+mots=c("d'une","ça","parce","enfin","bec","pr","re","r","comme","bien",
              "enfin","plus", "où", "celui", "a", "n'a", "si",
              "c'est", "pour", "donc", "ainsi", "deux","tout",
              "alors","qu'on", "autres","tre", "b", "e", "curit", 
@@ -47,7 +47,7 @@ token <-
     remove_url = TRUE
    )
 token_2 <- tokens_select(token, pattern = stopwords("French"), selection = "remove")
-token_3 <-tokens_remove(token_2, autresMots, padding = FALSE)
+token_3 <-tokens_remove(token_2, mots, padding = FALSE)
 
 mydfm <- dfm(token_3)
 
@@ -58,7 +58,8 @@ textplot_wordcloud(mydfm,
                    color = rev(RColorBrewer::brewer.pal(10, "RdBu")), 
                    rotation=0.25, 
                    min_size = 0.5)
-#2.Analyse de frequence simple
+
+#Analyse de frequence simple
 
 require(quanteda)
 require(quanteda.textstats)
@@ -106,7 +107,6 @@ MonDictionnaire <- dictionary(list(algorithme= c("algorithme","arbre de décisio
                                                                 "superintelligence arificielle","l'intelligence artificielle","d'intelligence artificielle","'intelligence artificielle","artificial neuron", 
                                                                 "neurones artificielles", "bots", "chatbots")))
 #MonDictionnaire
-# Création du deuxième data.frame dans lequel on obtient le nombre d'occurences des mots du dictionnaire.
 mondfm_dictionnaire=convert(dfm(mydfm, dictionary = MonDictionnaire), "matrix")
 summary (mondfm_dictionnaire)
 
