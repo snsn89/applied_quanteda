@@ -1,4 +1,4 @@
-# Load all required packages
+# Load required packages
 install.packages("tidyverse")
 install.packages('R6')
 install.packages("tidyverse")
@@ -12,15 +12,15 @@ library(gsl)
 library(topicmodels)      
 library(caret)
 library(igraph)
-#install.packages("quanteda.textplots")
+install.packages("quanteda.textplots")
 library(quanteda.textplots)
-#install.packages("quanteda.corpora")
+install.packages("quanteda.corpora")
 
 municipal=readtext('Municipalités.txt')
 mycorpus <- corpus(municipal)
 mycorpus
-#mycorpus.stats <- summary(mycorpus)
-#head(mycorpus.stats, n = 10)
+mycorpus.stats <- summary(mycorpus)
+head(mycorpus.stats, n = 10)
 
 # Preprocess the text
 # Create tokens
@@ -83,7 +83,7 @@ mydfm %>%
   labs(x = NULL, y = "Analyse de fréquence, n=15 (Municipalités & Villes du QC)") +
   theme_minimal()
 
-# Création du dictionnaire avec les équivalents.
+# Création du dictionnaire avec les mots équivalents
 MonDictionnaire <- dictionary(list(algorithme= c("algorithme","arbre de décision", "algorithmes de classification", "algorithmes de régression", 
                                                  "decision tree", "clustering algorithm", "décision automatique", 
                                                  "automated decion","algorithmiques","algorithmiques","Algorithmic","algorithmic","raisonnement analogique", "analogical reasonning", 
